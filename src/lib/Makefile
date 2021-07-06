@@ -1,22 +1,30 @@
 # ターゲットの定義
-OBJS = raw_socket.c
+SRCS = raw_socket.c
+OBJ_DIR = .obj/
+OBJS = $(OBJ_DIR)$(SRCS:.c=.o)
+DEPS = $(OBJ_DIR)$(SRCS:.c=.d)
 
 # 定義済みマクロの再定義
 CC = gcc
 CFLAGS = -MMD -Wall -g
 
-# サフィックスルール: .oファイルは.cファイルに依存している
-.SUFFIXES: .c .o
+.PHONY: all clean
 
-.PHONY: all
+all: pre-build build
+
+pre-build:
+	install -d $(OBJ_DIR)
 
 # サフィックスルールにより依存ファイルを全てコンパイル
-.c.o:
-	$(CC) $(CFLAGS) -o .obj/ -c $<
+build: $(OBJS)
 
--include .obj/raw_socket.d
+$(OBJS): $(SRCS)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # cleanルール
 .PHONY: clean
 clean:
-	$(RM) $(COMMAND) $(OBJS)
+	$(RM) $(OBJS) $(DEPS)
+	$(RM) -r $(OBJ_DIR)
+
+-include $(DEPS)

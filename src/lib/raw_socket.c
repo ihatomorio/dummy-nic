@@ -2,10 +2,13 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <errno.h>
+#include <stdio.h>
 #include <string.h>
 #include <linux/if_packet.h>
 #include <net/if.h>
 #include <net/ethernet.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 
 int get_raw_socket(const char *device_name)
 {
