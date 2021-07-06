@@ -1,8 +1,11 @@
 # ターゲットの定義
-SRCS = raw_socket.c
+SRCS = dummy-nic.c
 OBJ_DIR = .obj/
 OBJS = $(OBJ_DIR)$(SRCS:.c=.o)
 DEPS = $(OBJ_DIR)$(SRCS:.c=.d)
+
+TARGET = $(OBJ_DIR)dummy-nic
+LIBOBJS = lib/$(OBJ_DIR)raw_socket.o
 
 # 定義済みマクロの再定義
 CC = gcc
@@ -19,10 +22,13 @@ pre-build:
 		fi;
 
 # サフィックスルールにより依存ファイルを全てコンパイル
-build: $(OBJS)
+build: $(OBJS) $(TARGET)
 
 $(OBJS): $(SRCS)
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(TARGET): $(OBJS) $(LIBOBJS)
+	$(CC) $(LFLAGS) $+ -o $@
 
 # cleanルール
 .PHONY: clean
