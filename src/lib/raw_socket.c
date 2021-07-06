@@ -23,7 +23,7 @@ int get_raw_socket(const char *device_name)
 
     if (socket_descriptor == -1)
     {
-        printf("system call error: %s\n", strerror(tmp_errno));
+        fprintf(stderr, "system call error: %s\n", strerror(tmp_errno));
         goto final;
     }
 
@@ -34,7 +34,7 @@ int get_raw_socket(const char *device_name)
 
     if (syscall_returns == -1)
     {
-        printf("system call error: %s\n", strerror(tmp_errno));
+        fprintf(stderr, "system call error: %s\n", strerror(tmp_errno));
         close(socket_descriptor);
         socket_descriptor = -1;
         goto final;
@@ -49,7 +49,7 @@ int get_raw_socket(const char *device_name)
     
     if (syscall_returns == -1)
     {
-        printf("system call error: %s\n", strerror(tmp_errno));
+        fprintf(stderr, "system call error: %s\n", strerror(tmp_errno));
         close(socket_descriptor);
         socket_descriptor = -1;
         goto final;
