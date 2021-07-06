@@ -7,13 +7,11 @@
 #include <arpa/inet.h>       //inet_aton()
 #include <sys/types.h>       //socket(), send()
 #include <sys/socket.h>      //socket(), send(), inet_aton()
-#include <sys/ioctl.h>       //ioctl()
 #include <netinet/in.h>      //inet_aton()
 #include <netinet/ip.h>      //iphdr
 #include <netinet/udp.h>     //udphdr
 #include <net/ethernet.h>
 #include <net/if.h>
-#include <netpacket/packet.h> //sockaddr_ll
 
 #include "lib/raw_socket.h"
 
