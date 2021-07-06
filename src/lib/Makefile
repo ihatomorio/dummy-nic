@@ -13,7 +13,10 @@ CFLAGS = -MMD -Wall -g
 all: pre-build build
 
 pre-build:
-	install -d $(OBJ_DIR)
+# .obj 作成をこっそりやる
+	@ if [ ! -d "$(OBJ_DIR)" ]; then \
+		install -d $(OBJ_DIR); \
+		fi;
 
 # サフィックスルールにより依存ファイルを全てコンパイル
 build: $(OBJS)
@@ -24,7 +27,6 @@ $(OBJS): $(SRCS)
 # cleanルール
 .PHONY: clean
 clean:
-	$(RM) $(OBJS) $(DEPS)
 	$(RM) -r $(OBJ_DIR)
 
 -include $(DEPS)
