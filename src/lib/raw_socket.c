@@ -223,8 +223,6 @@ ssize_t read_raw_packet(int socket_descriptor, char **packet)
     }
 
     *packet = (char *)bpfhdr_ptr + bpfhdr_ptr->bh_hdrlen;
-    printf("-----------raw_socket \n");
-    print_hex(*packet, bpfhdr_ptr->bh_datalen);
     return bpfhdr_ptr->bh_datalen;
 
 #endif
@@ -246,8 +244,6 @@ ssize_t read_raw_packet(int socket_descriptor, char **packet)
         return -1;
     }
 
-    printf("-----------raw_socket \n");
-    print_hex(packet, read_siz);
     return read_siz;
 #endif
     return 0;
