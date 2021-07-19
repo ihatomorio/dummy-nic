@@ -44,11 +44,22 @@ int get_raw_socket(const char *device_name)
 
     if( device_name == NULL)
     {
-        fprintf(stderr, "No device name");
+        fprintf(stderr, "No device name\n");
         goto final;
     }
 
-    strncpy(ioctl_request.ifr_name, device_name, sizeof(ioctl_request.ifr_name) - 1);
+    if( strlen(device_name) > IFNAMSIZ )
+    {
+        fprintf(stderr, "Too long device name\n");
+    }
+    else if( strlen(device_name) < 1 )
+    {
+        fprintf(stderr, "Empty device name\n");
+    }
+    else
+    {
+        strncpy(ioctl_request.ifr_name, device_name, IFNAMSIZ);
+    }
 
 #ifdef __linux
     int syscall_returns = 0;
