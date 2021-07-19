@@ -38,14 +38,16 @@ int main(int argc, char *argv[])
             break;
         default: /* '?' */
             fprintf(stderr, USAGE_STR, argv[0]);
-            exit(EXIT_FAILURE);
+            exit_status = EXIT_FAILURE;
+            goto final;
         }
     }
     
     if (strlen(interface_name) == 0)
     {
         fprintf(stderr, USAGE_STR, argv[0]);
-        exit(EXIT_FAILURE);
+        exit_status = EXIT_FAILURE;
+        goto final;
     }
 
     socket_descriptor = get_raw_socket(interface_name);
