@@ -245,6 +245,8 @@ ssize_t read_raw_packet(int socket_descriptor, char **packet)
     }
 
     return read_siz;
+#else
+    fprintf(stderr, "Arch not supported.\n");
+    return -1;
 #endif
-    return 0;
 }
