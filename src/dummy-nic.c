@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
         goto final;
     }
 
-    
+    close(socket_descriptor);
 final:
     return exit_status;
 }
