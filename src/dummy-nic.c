@@ -35,18 +35,6 @@ int main(int argc, char *argv[])
     int option_char;
     char interface_name[IFNAMSIZ] = {0};
     int socket_descriptor = -1;
-    int function_result = 0;
-    uint8_t *udp_payload = NULL;
-    size_t udp_payload_len = 0;
-    void *udp_packet = NULL;
-    size_t udp_packet_len = 0;
-    void *ip_packet = NULL;
-    size_t ip_packet_len = 0;
-    uint16_t ip_packet_id = 0;
-    void *ether_frame = NULL;
-    size_t ether_frame_length = 0;
-    ssize_t sent_bytes = 0;
-    int i;
 
     while ((option_char = getopt(argc, argv, "I:")) != -1)
     {
@@ -77,7 +65,6 @@ int main(int argc, char *argv[])
 
     
 final:
-    SAFE_FREE(udp_payload);
     return exit_status;
 }
 

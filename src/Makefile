@@ -9,7 +9,7 @@ LIBOBJS = lib/$(OBJ_DIR)raw_socket.o
 
 # 定義済みマクロの再定義
 CC = gcc
-CFLAGS = -MP -MMD -Wall -g
+CFLAGS = -MP -MMD -Wall -g -Werror
 
 .PHONY: all clean
 

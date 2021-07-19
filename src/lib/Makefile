@@ -6,7 +6,7 @@ DEPS = $(OBJ_DIR)$(SRCS:.c=.d)
 
 # 定義済みマクロの再定義
 CC = gcc
-CFLAGS = -MP -MMD -Wall -g
+CFLAGS = -MP -MMD -Wall -g -Werror
 
 .PHONY: all clean
 
