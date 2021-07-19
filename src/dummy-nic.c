@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
             goto catch;
         }
 
-        printf("-----------program \n");
+        printf("-----------read:%zu \n", packet_size);
         print_hex(packet, packet_size);
     }
 
