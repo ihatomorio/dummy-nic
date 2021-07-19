@@ -73,14 +73,14 @@ int get_raw_socket(const char *device_name)
     socket_descriptor = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
     if (socket_descriptor == -1)
     {
-        perror("system call error");
+        perror("socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL))");
         goto final;
     }
 
     syscall_returns = ioctl(socket_descriptor, SIOCGIFINDEX, &ioctl_request);
     if (syscall_returns == -1)
     {
-        perror("system call error");
+        perror("ioctl(socket_descriptor, SIOCGIFINDEX, &ioctl_request)");
         goto catch;
     }
 
@@ -91,14 +91,14 @@ int get_raw_socket(const char *device_name)
     syscall_returns = bind(socket_descriptor, (struct sockaddr *)&sll, sizeof(sll));
     if (syscall_returns == -1)
     {
-        perror("system call error");
+        perror("bind(socket_descriptor, (struct sockaddr *)&sll, sizeof(sll))");
         goto catch;
     }
 
     syscall_returns = ioctl(socket_descriptor, SIOCGIFFLAGS, &ioctl_request);
     if (syscall_returns == -1)
     {
-        perror("system call error");
+        perror("ioctl(socket_descriptor, SIOCGIFFLAGS, &ioctl_request)");
         goto catch;
     }
 
@@ -106,7 +106,7 @@ int get_raw_socket(const char *device_name)
     syscall_returns = ioctl(socket_descriptor, SIOCSIFFLAGS, &ioctl_request);
     if (syscall_returns == -1)
     {
-        perror("system call error");
+        perror("ioctl(socket_descriptor, SIOCSIFFLAGS, &ioctl_request)");
         goto catch;
     }
     
@@ -173,7 +173,10 @@ int get_raw_socket(const char *device_name)
     }
 
 #endif //END TARGET_OS_OSX
-#endif //END __linux
+#else //END __linux
+    fprintf(stderr, "Arch not supported.\n");
+    goto final;
+#endif
 
     goto final;
 catch:
@@ -245,7 +248,7 @@ ssize_t read_raw_packet(int socket_descriptor, char **packet)
     }
 
     return read_siz;
-#else
+#else //END __linux
     fprintf(stderr, "Arch not supported.\n");
     return -1;
 #endif
