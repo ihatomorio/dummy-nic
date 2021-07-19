@@ -232,7 +232,7 @@ ssize_t read_raw_packet(int socket_descriptor, char **packet)
 #elif defined(__linux)
     if( *packet == NULL)
     {
-        *packet = (char *)calloc(sizeof(char), BUFSIZ);
+        *packet = calloc(sizeof(char), BUFSIZ);
     }
     if( *packet == NULL )
     {
@@ -240,7 +240,7 @@ ssize_t read_raw_packet(int socket_descriptor, char **packet)
         return -1;
     }
 
-    ssize_t read_siz = read(socket_descriptor, packet, BUFSIZ);
+    ssize_t read_siz = read(socket_descriptor, *packet, BUFSIZ);
     if( read_siz == -1 )
     {
         perror("read");
