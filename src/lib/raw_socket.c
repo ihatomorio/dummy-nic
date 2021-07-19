@@ -4,15 +4,35 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
-#include <linux/if_packet.h>
 #include <net/if.h>
 #include <net/ethernet.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 
+#ifdef __linux
+    #include <linux/if_packet.h>
+
+#elif defined(__APPLE__)
+#include <TargetConditionals.h>
+#ifdef TARGET_OS_OSX
+
+    /// bpf
+    #include <sys/time.h>
+    #include <net/bpf.h>
+
+    #include <fcntl.h> //open
+
+    #define BPF_PATH_BUFLEN 11
+
+#endif //END TARGET_OS_OSX
+#endif //END __linux
+
+
+
 int get_raw_socket(const char *device_name)
 {
     int socket_descriptor = -1;
+#ifdef __linux
     struct ifreq ioctl_request;
     int syscall_returns = 0;
     struct sockaddr_ll sll;
@@ -35,9 +55,7 @@ int get_raw_socket(const char *device_name)
     if (syscall_returns == -1)
     {
         fprintf(stderr, "system call error: %s\n", strerror(tmp_errno));
-        close(socket_descriptor);
-        socket_descriptor = -1;
-        goto final;
+        goto catch;
     }
 
     sll.sll_family = PF_PACKET;
@@ -50,11 +68,85 @@ int get_raw_socket(const char *device_name)
     if (syscall_returns == -1)
     {
         fprintf(stderr, "system call error: %s\n", strerror(tmp_errno));
-        close(socket_descriptor);
-        socket_descriptor = -1;
+        goto catch;
+    }
+
+#elif defined(__APPLE__)
+#include <TargetConditionals.h>
+#ifdef TARGET_OS_OSX
+
+    char bpfpath[BPF_PATH_BUFLEN] = {0};
+    int i=0;
+    u_int bpf_buf_len = 0;
+    struct ifreq bpf_param = {0};
+    int syscall_returns = -1;
+
+    if( device_name == NULL)
+    {
+        fprintf(stderr, "No device name");
+        goto final;
+    }
+    strncpy((char *)&bpf_param.ifr_name, device_name, IFNAMSIZ);
+
+    /// Try open bpf file
+    for( i=0; i<99; i++)
+    {
+        snprintf(&bpfpath[0], BPF_PATH_BUFLEN, "/dev/bpf%d", i);
+        
+        socket_descriptor = open(bpfpath, O_RDONLY);
+        if( socket_descriptor > 0 )
+        {
+            fprintf(stdout, "got bpf %s\n", bpfpath);
+            break;
+        }
+    }
+
+    // If failed, none opened.
+    if( socket_descriptor == -1)
+    {
+        fprintf(stderr, "socket error: %d\n", socket_descriptor);
         goto final;
     }
 
+    /// Get buffer len
+    syscall_returns = ioctl(socket_descriptor, BIOCGBLEN, &bpf_buf_len);
+    if(syscall_returns == -1)
+    {
+        perror("ioctl(socket_descriptor, BIOCGBLEN, &bpf_buf_len)");
+        goto catch;
+    }
+    printf("buflen: %u\n", bpf_buf_len);
+
+    /// Set buffer len
+    syscall_returns = ioctl(socket_descriptor, BIOCSBLEN, &bpf_buf_len);
+    if(syscall_returns == -1)
+    {
+        perror("ioctl(socket_descriptor, BIOCSBLEN, &bpf_buf_len)");
+        goto catch;
+    }
+
+    /// bind IF
+    syscall_returns = ioctl(socket_descriptor, BIOCSETIF, &bpf_param);
+    if(syscall_returns == -1)
+    {
+        perror("ioctl(socket_descriptor, BIOCSETIF, &bpf_param);");
+        goto catch;
+    }
+
+    /// Enable promisc
+    syscall_returns = ioctl(socket_descriptor, BIOCPROMISC, NULL);
+    if(syscall_returns == -1)
+    {
+        perror("ioctl(socket_descriptor, BIOCPROMISC, NULL);");
+        goto catch;
+    }
+
+#endif //END TARGET_OS_OSX
+#endif //END __linux
+
+    goto final;
+catch:
+    close(socket_descriptor);
 final:
     return socket_descriptor;
 }

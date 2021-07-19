@@ -20,6 +20,7 @@ pre-build:
 	@ if [ ! -d "$(OBJ_DIR)" ]; then \
 		install -d $(OBJ_DIR); \
 		fi;
+	@make -C lib
 
 # サフィックスルールにより依存ファイルを全てコンパイル
 build: $(OBJS) $(TARGET)
