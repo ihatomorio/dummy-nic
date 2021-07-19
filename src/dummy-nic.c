@@ -81,9 +81,6 @@ int main(int argc, char *argv[])
         {
             goto catch;
         }
-        
-        printf("-----------main \n");
-        print_hex(packet, packet_size );
     }
 
 catch:
