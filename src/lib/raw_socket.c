@@ -32,8 +32,17 @@
 int get_raw_socket(const char *device_name)
 {
     int socket_descriptor = -1;
+    struct ifreq ioctl_request = {0};
+
+    if( device_name == NULL)
+    {
+        fprintf(stderr, "No device name");
+        goto final;
+    }
+
+    strncpy(ioctl_request.ifr_name, device_name, sizeof(ioctl_request.ifr_name) - 1);
+
 #ifdef __linux
-    struct ifreq ioctl_request;
     int syscall_returns = 0;
     struct sockaddr_ll sll;
     int tmp_errno = 0;
@@ -46,8 +55,6 @@ int get_raw_socket(const char *device_name)
         fprintf(stderr, "system call error: %s\n", strerror(tmp_errno));
         goto final;
     }
-
-    strncpy(ioctl_request.ifr_name, device_name, sizeof(ioctl_request.ifr_name) - 1);
 
     syscall_returns = ioctl(socket_descriptor, SIOCGIFINDEX, &ioctl_request);
     tmp_errno = errno;
@@ -78,15 +85,7 @@ int get_raw_socket(const char *device_name)
     char bpfpath[BPF_PATH_BUFLEN] = {0};
     int i=0;
     u_int bpf_buf_len = 0;
-    struct ifreq bpf_param = {0};
     int syscall_returns = -1;
-
-    if( device_name == NULL)
-    {
-        fprintf(stderr, "No device name");
-        goto final;
-    }
-    strncpy((char *)&bpf_param.ifr_name, device_name, IFNAMSIZ);
 
     /// Try open bpf file
     for( i=0; i<99; i++)
@@ -126,10 +125,10 @@ int get_raw_socket(const char *device_name)
     }
 
     /// bind IF
-    syscall_returns = ioctl(socket_descriptor, BIOCSETIF, &bpf_param);
+    syscall_returns = ioctl(socket_descriptor, BIOCSETIF, &ioctl_request);
     if(syscall_returns == -1)
     {
-        perror("ioctl(socket_descriptor, BIOCSETIF, &bpf_param);");
+        perror("ioctl(socket_descriptor, BIOCSETIF, &ioctl_request);");
         goto catch;
     }
 
