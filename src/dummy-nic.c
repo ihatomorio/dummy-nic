@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
         }
 
         printf("-----------program \n");
-        print_hex(&packet, packet_size);
+        print_hex(packet, packet_size);
     }
 
 catch:
