@@ -1,8 +1,8 @@
 # ターゲットの定義
 SRCS = dummy-nic.c
 OBJ_DIR = .obj/
-OBJS = $(OBJ_DIR)$(SRCS:.c=.o)
-DEPS = $(OBJ_DIR)$(SRCS:.c=.d)
+OBJS = $(patsubst %.c,$(OBJ_DIR)%.o,$(SRCS))
+DEPS = $(patsubst %.c,$(OBJ_DIR)%.d,$(SRCS))
 
 TARGET = $(OBJ_DIR)dummy-nic
 LIBOBJS = lib/$(OBJ_DIR)raw_socket.o lib/$(OBJ_DIR)util.o
@@ -10,7 +10,7 @@ LIBOBJS = lib/$(OBJ_DIR)raw_socket.o lib/$(OBJ_DIR)util.o
 # 定義済みマクロの再定義
 CC = gcc
 CFLAGS = -MP -MMD -Wall -g -Werror
-LFLAGS = -lc
+LDFLAGS = -lc
 
 .PHONY: all clean
 
@@ -26,15 +26,17 @@ pre-build:
 # サフィックスルールにより依存ファイルを全てコンパイル
 build: $(OBJS) $(TARGET)
 
-$(OBJS): $(SRCS)
-	$(CC) $(CFLAGS) -c $< -o $@
+$(OBJ_DIR)%.o : %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $*.c -o $(OBJ_DIR)$*.o
 
 $(TARGET): $(OBJS) $(LIBOBJS)
-	$(CC) $(LFLAGS) $+ -o $@
+	$(CC) $(LDFLAGS) $+ -o $@
 
 # cleanルール
 .PHONY: clean
 clean:
+	make clean -C lib
 	$(RM) -r $(OBJ_DIR)
 
+# include dependency
 -include $(DEPS)

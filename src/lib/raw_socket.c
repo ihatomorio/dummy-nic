@@ -2,8 +2,6 @@
 #include <stdio.h>          // printf, strerror
 #include <unistd.h>         // close
 
-#include "util.h"
-
 #ifdef __linux
     #include <sys/ioctl.h>      // ioctl, see ioctl_list(2)
     #include <net/if.h>         // struct ifreq
@@ -40,6 +38,7 @@
 #endif //END TARGET_OS_OSX
 #endif //END __linux
 
+#include "util.h"
 
 
 int get_raw_socket(const char *device_name)
@@ -222,5 +221,5 @@ ssize_t read_raw_packet(int socket_descriptor, char **packet)
 
 #endif
 #endif
-    return bpfhdr_ptr->bh_datalen;
+    return 0;
 }
