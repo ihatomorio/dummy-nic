@@ -1,24 +1,32 @@
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
-#include <net/if.h>
-#include <net/ethernet.h>
-#include <arpa/inet.h>
-#include <unistd.h>
+#include <string.h>         // strcpy
+#include <stdio.h>          // printf, strerror
+#include <unistd.h>         // close
 
 #ifdef __linux
-    #include <linux/if_packet.h>
+    #include <sys/ioctl.h>      // ioctl, see ioctl_list(2)
+    #include <net/if.h>         // struct ifreq
+    /// socket, bind
+    #include <sys/types.h>
+    #include <sys/socket.h>
+    #include <net/ethernet.h>   // ETH_P_ALL from PACKET(7)
+    #include <arpa/inet.h>      // htons
+
+    #include <errno.h>          // errno
+
+    #include <linux/if_packet.h> // PACKET(7)
 
 #elif defined(__APPLE__)
 #include <TargetConditionals.h>
 #ifdef TARGET_OS_OSX
 
     /// bpf
+    #include <sys/types.h>
     #include <sys/time.h>
+    #include <sys/ioctl.h>
     #include <net/bpf.h>
+    /// BIOCSETIF from bpf
+    #include <sys/socket.h>
+    #include <net/if.h>
 
     #include <fcntl.h> //open
 
