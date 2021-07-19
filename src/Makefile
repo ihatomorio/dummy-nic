@@ -14,7 +14,7 @@ LDFLAGS = -lc
 
 .PHONY: all clean
 
-all: pre-build build
+all: pre-build build post-build
 
 pre-build:
 # .obj 作成をこっそりやる
@@ -31,6 +31,10 @@ $(OBJ_DIR)%.o : %.c
 
 $(TARGET): $(OBJS) $(LIBOBJS)
 	$(CC) $(LDFLAGS) $+ -o $@
+
+post-build:
+	@sudo chown root $(TARGET)
+	@sudo chmod u+s $(TARGET)
 
 # cleanルール
 .PHONY: clean

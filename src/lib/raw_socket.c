@@ -12,6 +12,7 @@
     #include <arpa/inet.h>      // htons
 
     #include <errno.h>          // errno
+    #include <stdlib.h> // malloc
 
     #include <linux/if_packet.h> // PACKET(7)
 
@@ -44,6 +45,7 @@
 int get_raw_socket(const char *device_name)
 {
     int socket_descriptor = -1;
+    int syscall_returns = -1;
     struct ifreq ioctl_request = {0};
 
     if( device_name == NULL)
@@ -66,25 +68,19 @@ int get_raw_socket(const char *device_name)
     }
 
 #ifdef __linux
-    int syscall_returns = 0;
-    struct sockaddr_ll sll;
-    int tmp_errno = 0;
+    struct sockaddr_ll sll = {0};
 
     socket_descriptor = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
-    tmp_errno = errno;
-
     if (socket_descriptor == -1)
     {
-        fprintf(stderr, "system call error: %s\n", strerror(tmp_errno));
+        perror("system call error");
         goto final;
     }
 
     syscall_returns = ioctl(socket_descriptor, SIOCGIFINDEX, &ioctl_request);
-    tmp_errno = errno;
-
     if (syscall_returns == -1)
     {
-        fprintf(stderr, "system call error: %s\n", strerror(tmp_errno));
+        perror("system call error");
         goto catch;
     }
 
@@ -93,22 +89,33 @@ int get_raw_socket(const char *device_name)
     sll.sll_ifindex = ioctl_request.ifr_ifindex;
 
     syscall_returns = bind(socket_descriptor, (struct sockaddr *)&sll, sizeof(sll));
-    tmp_errno = errno;
-    
     if (syscall_returns == -1)
     {
-        fprintf(stderr, "system call error: %s\n", strerror(tmp_errno));
+        perror("system call error");
         goto catch;
     }
 
+    syscall_returns = ioctl(socket_descriptor, SIOCGIFFLAGS, &ioctl_request);
+    if (syscall_returns == -1)
+    {
+        perror("system call error");
+        goto catch;
+    }
+
+    ioctl_request.ifr_flags = ioctl_request.ifr_flags|IFF_PROMISC|IFF_UP;
+    syscall_returns = ioctl(socket_descriptor, SIOCSIFFLAGS, &ioctl_request);
+    if (syscall_returns == -1)
+    {
+        perror("system call error");
+        goto catch;
+    }
+    
 #elif defined(__APPLE__)
 #include <TargetConditionals.h>
 #ifdef TARGET_OS_OSX
-
     char bpfpath[BPF_PATH_BUFLEN] = {0};
     int i=0;
     u_int bpf_buf_len = 0;
-    int syscall_returns = -1;
 
     /// Try open bpf file
     for( i=0; i<99; i++)
@@ -218,8 +225,30 @@ ssize_t read_raw_packet(int socket_descriptor, char **packet)
     *packet = (char *)bpfhdr_ptr + bpfhdr_ptr->bh_hdrlen;
     printf("-----------raw_socket \n");
     print_hex(*packet, bpfhdr_ptr->bh_datalen);
+    return bpfhdr_ptr->bh_datalen;
 
 #endif
+#elif defined(__linux)
+    if( *packet == NULL)
+    {
+        *packet = (char *)calloc(sizeof(char), BUFSIZ);
+    }
+    if( *packet == NULL )
+    {
+        perror("calloc buf");
+        return -1;
+    }
+
+    ssize_t read_siz = read(socket_descriptor, packet, BUFSIZ);
+    if( read_siz == -1 )
+    {
+        perror("read");
+        return -1;
+    }
+
+    printf("-----------raw_socket \n");
+    print_hex(packet, read_siz);
+    return read_siz;
 #endif
     return 0;
 }

@@ -73,14 +73,21 @@ int main(int argc, char *argv[])
         goto final;
     }
 
+    fprintf(stdout, "got socket: %d\n", socket_descriptor);
+
     char *packet = NULL;
     while(1)
     {
         ssize_t packet_size = read_raw_packet(socket_descriptor, &packet);
         if( packet_size == -1)
         {
+            perror("failed at read_raw_packet");
+            exit_status = 1;
             goto catch;
         }
+
+        printf("-----------program \n");
+        print_hex(&packet, packet_size);
     }
 
 catch:
