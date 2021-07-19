@@ -165,6 +165,7 @@ int get_raw_socket(const char *device_name)
     goto final;
 catch:
     close(socket_descriptor);
+    socket_descriptor = -1;
 final:
     return socket_descriptor;
 }
