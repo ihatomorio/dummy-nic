@@ -1,8 +1,8 @@
 # ターゲットの定義
-SRCS = raw_socket.c
+SRCS = raw_socket.c util.c
 OBJ_DIR = .obj/
-OBJS = $(OBJ_DIR)$(SRCS:.c=.o)
-DEPS = $(OBJ_DIR)$(SRCS:.c=.d)
+OBJS = $(OBJ_DIR)raw_socket.o $(OBJ_DIR)util.o
+DEPS = $(OBJ_DIR)raw_socket.d $(OBJ_DIR)util.d
 
 # 定義済みマクロの再定義
 CC = gcc
@@ -21,7 +21,10 @@ pre-build:
 # サフィックスルールにより依存ファイルを全てコンパイル
 build: $(OBJS)
 
-$(OBJS): $(SRCS)
+$(OBJ_DIR)raw_socket.o: raw_socket.c util.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)util.o: util.c util.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # cleanルール

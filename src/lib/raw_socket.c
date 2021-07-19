@@ -2,6 +2,8 @@
 #include <stdio.h>          // printf, strerror
 #include <unistd.h>         // close
 
+#include "util.h"
+
 #ifdef __linux
     #include <sys/ioctl.h>      // ioctl, see ioctl_list(2)
     #include <net/if.h>         // struct ifreq
@@ -29,8 +31,11 @@
     #include <net/if.h>
 
     #include <fcntl.h> //open
+    #include <stdlib.h> // malloc
 
     #define BPF_PATH_BUFLEN 11
+
+    static size_t __bpf_buf_zize;
 
 #endif //END TARGET_OS_OSX
 #endif //END __linux
@@ -133,6 +138,8 @@ int get_raw_socket(const char *device_name)
         perror("ioctl(socket_descriptor, BIOCGBLEN, &bpf_buf_len)");
         goto catch;
     }
+
+    __bpf_buf_zize = bpf_buf_len;
     printf("buflen: %u\n", bpf_buf_len);
 
     /// Set buffer len
@@ -168,4 +175,52 @@ catch:
     socket_descriptor = -1;
 final:
     return socket_descriptor;
+}
+
+
+ssize_t read_raw_packet(int socket_descriptor, char **packet)
+{
+#if defined(__APPLE__)
+#include <TargetConditionals.h>
+#ifdef TARGET_OS_OSX
+    /// read buffer for some packets
+    static char *buf = NULL;
+    /// remain bytes in read_buf
+    ssize_t read_siz = 0;
+    /// head address for read_buf
+    static struct bpf_hdr* bpfhdr_ptr = NULL;
+
+    if( buf == NULL)
+    {
+        buf = (char *)calloc(sizeof(char), __bpf_buf_zize);
+    }
+    if( buf == NULL )
+    {
+        perror("calloc buf");
+        return -1;
+    }
+
+    if( read_siz <= 0 )
+    {
+        read_siz = read(socket_descriptor, buf, __bpf_buf_zize);
+        if( read_siz == -1 )
+        {
+            perror("read");
+            return -1;
+        }
+        bpfhdr_ptr = (struct bpf_hdr *)buf;
+    }
+    else
+    {
+        bpfhdr_ptr = (struct bpf_hdr *)( (char *)bpfhdr_ptr + BPF_WORDALIGN( bpfhdr_ptr->bh_hdrlen + bpfhdr_ptr->bh_caplen) );
+        read_siz -= BPF_WORDALIGN( bpfhdr_ptr->bh_hdrlen + bpfhdr_ptr->bh_caplen);
+    }
+
+    *packet = (char *)bpfhdr_ptr + bpfhdr_ptr->bh_hdrlen;
+    printf("-----------raw_socket \n");
+    print_hex(*packet, bpfhdr_ptr->bh_datalen);
+
+#endif
+#endif
+    return bpfhdr_ptr->bh_datalen;
 }

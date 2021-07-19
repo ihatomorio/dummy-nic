@@ -5,7 +5,7 @@ OBJS = $(OBJ_DIR)$(SRCS:.c=.o)
 DEPS = $(OBJ_DIR)$(SRCS:.c=.d)
 
 TARGET = $(OBJ_DIR)dummy-nic
-LIBOBJS = lib/$(OBJ_DIR)raw_socket.o
+LIBOBJS = lib/$(OBJ_DIR)raw_socket.o lib/$(OBJ_DIR)util.o
 
 # 定義済みマクロの再定義
 CC = gcc
