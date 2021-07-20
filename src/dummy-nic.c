@@ -86,8 +86,14 @@ int main(int argc, char *argv[])
             goto catch;
         }
 
-        printf("-----------read:%zu \n", packet_size);
-        print_hex(packet, packet_size);
+        // print_hex(packet, packet_size);
+
+        struct  ether_header *ethframe = (struct ether_header *)packet;
+        if( ethframe->ether_type == htons(ETHERTYPE_ARP) )
+        {
+            printf("length:%zu \n", packet_size);
+        }
+
     }
 
 catch:
