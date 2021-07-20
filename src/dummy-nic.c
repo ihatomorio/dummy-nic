@@ -10,6 +10,7 @@
 
 #include "lib/raw_socket.h"
 #include "lib/util.h"
+#include "lib/packet_handler.h"
 
 #define USAGE_STR "Usage: %s -I interface -m macaddr\n"
 #define OPTION_CHAR "I:m:"
@@ -72,14 +73,7 @@ int main(int argc, char *argv[])
             goto catch;
         }
 
-        // print_hex(packet, packet_size);
-
-        struct  ether_header *ethframe = (struct ether_header *)packet;
-        if( ethframe->ether_type == htons(ETHERTYPE_ARP) )
-        {
-            printf("length:%zu \n", packet_size);
-        }
-
+        packet_handler(packet, packet_size);
     }
 
 catch:

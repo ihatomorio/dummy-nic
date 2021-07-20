@@ -1,5 +1,5 @@
 # ターゲットの定義
-SRCS = raw_socket.c util.c
+SRCS = raw_socket.c util.c packet_handler.c
 OBJ_DIR = .obj/
 OBJS = $(patsubst %.c,$(OBJ_DIR)%.o,$(SRCS))
 DEPS = $(patsubst %.c,$(OBJ_DIR)%.d,$(SRCS))
