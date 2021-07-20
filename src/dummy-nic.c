@@ -2,16 +2,11 @@
 #include <stddef.h>          //size_t
 #include <stdio.h>           //printf()
 #include <stdlib.h>          //calloc(), free()
-#include <string.h>          //memcpy()
+#include <string.h>          //memcpy(), strlen, strncpy
 #include <unistd.h>          //close()
 #include <arpa/inet.h>       //inet_aton()
-#include <sys/types.h>       //socket(), send()
-#include <sys/socket.h>      //socket(), send(), inet_aton()
-#include <netinet/in.h>      //inet_aton()
-#include <netinet/ip.h>      //iphdr
-#include <netinet/udp.h>     //udphdr
-#include <net/ethernet.h>
-#include <net/if.h>
+#include <net/ethernet.h>    // ether_header
+#include <net/if.h>             // IFNAMSIZ
 
 #ifdef __linux
 #elif defined(__APPLE__)
@@ -30,7 +25,9 @@
 #include "lib/raw_socket.h"
 #include "lib/util.h"
 
-#define USAGE_STR "Usage: %s [-I interface]\n"
+#define USAGE_STR "Usage: %s -I interface -m macaddr\n"
+#define OPTION_CHAR "I:m:"
+
 #define SAFE_FREE(ptr) { \
                         free(ptr); \
                         ptr = NULL; \
@@ -44,11 +41,14 @@ int main(int argc, char *argv[])
     char interface_name[IFNAMSIZ] = {0};
     int socket_descriptor = -1;
 
-    while ((option_char = getopt(argc, argv, "I:")) != -1)
+    while ((option_char = getopt(argc, argv, OPTION_CHAR)) != -1)
     {
         switch (option_char)
         {
         case 'I':
+            strncpy(interface_name, optarg, IFNAMSIZ);
+            break;
+        case 'm':
             strncpy(interface_name, optarg, IFNAMSIZ);
             break;
         default: /* '?' */
