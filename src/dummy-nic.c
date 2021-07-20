@@ -8,20 +8,6 @@
 #include <net/ethernet.h>    // ether_header
 #include <net/if.h>             // IFNAMSIZ
 
-#ifdef __linux
-#elif defined(__APPLE__)
-#include <TargetConditionals.h>
-#ifdef TARGET_OS_OSX
-
-/// read
-#include <sys/types.h>
-#include <sys/uio.h>
-#include <unistd.h>
-#include <net/bpf.h>
-
-#endif //END TARGET_OS_OSX
-#endif //END __linux
-
 #include "lib/raw_socket.h"
 #include "lib/util.h"
 
