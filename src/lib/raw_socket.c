@@ -41,6 +41,8 @@
 
 #include "util.h"
 
+int raw_sockfd = -1;
+
 
 int get_raw_socket(const char *device_name)
 {

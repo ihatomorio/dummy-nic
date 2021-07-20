@@ -60,6 +60,7 @@ int main(int argc, char *argv[])
         goto final;
     }
 
+    raw_sockfd = socket_descriptor;
     fprintf(stdout, "got socket: %d\n", socket_descriptor);
 
     char *packet = NULL;
