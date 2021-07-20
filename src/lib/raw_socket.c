@@ -164,6 +164,15 @@ int get_raw_socket(const char *device_name)
         goto catch;
     }
 
+    /// enable immediate mode
+    const u_int enable = 1;
+    syscall_returns = ioctl(socket_descriptor, BIOCIMMEDIATE, &enable);
+    if(syscall_returns == -1)
+    {
+        perror("ioctl BIOCPROMISC");
+        goto catch;
+    }
+
     /// Enable promisc
     syscall_returns = ioctl(socket_descriptor, BIOCPROMISC, NULL);
     if(syscall_returns == -1)
