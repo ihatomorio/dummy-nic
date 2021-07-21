@@ -2,6 +2,9 @@
 #include <arpa/inet.h>      // htons
 #include <net/ethernet.h>   // ether_header
 
+#include "handler/arp.h"
+
+/// handle ETHER frame
 void packet_handler(char *packet, ssize_t len)
 {
     
@@ -10,7 +13,7 @@ void packet_handler(char *packet, ssize_t len)
     switch (ethframe->ether_type)
     {
     case htons(ETHERTYPE_ARP):
-        printf("length:%zu \n", len);
+        handle_arp(packet, len);
         break;
     
     default:

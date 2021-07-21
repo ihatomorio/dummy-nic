@@ -1,5 +1,5 @@
 # ターゲットの定義
-SRCS = raw_socket.c util.c packet_handler.c
+SRCS = arp.c
 OBJ_DIR = .obj/
 OBJS = $(patsubst %.c,$(OBJ_DIR)%.o,$(SRCS))
 DEPS = $(patsubst %.c,$(OBJ_DIR)%.d,$(SRCS))
@@ -17,7 +17,6 @@ pre-build:
 	@ if [ ! -d "$(OBJ_DIR)" ]; then \
 		install -d $(OBJ_DIR); \
 		fi;
-	make -C handler
 
 # サフィックスルールにより依存ファイルを全てコンパイル
 build: $(OBJS)

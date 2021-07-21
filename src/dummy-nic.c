@@ -6,14 +6,20 @@
 #include <unistd.h>          //close()
 #include <arpa/inet.h>       //inet_aton()
 #include <net/ethernet.h>    // ether_header
-#include <net/if.h>             // IFNAMSIZ
+#include <net/if.h>          // IFNAMSIZ
+/// ETHERS(3) ether_aton
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <net/ethernet.h>
 
 #include "lib/raw_socket.h"
 #include "lib/util.h"
 #include "lib/packet_handler.h"
+#include "lib/handler/arp.h"
+#include "include/nicinfo.h"
 
-#define USAGE_STR "Usage: %s -I interface -m macaddr\n"
-#define OPTION_CHAR "I:m:"
+#define USAGE_STR "Usage: %s -I interface [-m macaddr] [-a ipaddr]\n"
+#define OPTION_CHAR "I:a:m:"
 
 #define SAFE_FREE(ptr) { \
                         free(ptr); \
@@ -27,6 +33,12 @@ int main(int argc, char *argv[])
     int option_char;
     char interface_name[IFNAMSIZ] = {0};
     int socket_descriptor = -1;
+    struct ether_addr *mac = NULL;
+    struct in_addr argip = {0};
+
+    vnic_entry = 1;
+
+    vnic = calloc(sizeof(struct nicinfo), vnic_entry);
 
     while ((option_char = getopt(argc, argv, OPTION_CHAR)) != -1)
     {
@@ -35,8 +47,22 @@ int main(int argc, char *argv[])
         case 'I':
             strncpy(interface_name, optarg, IFNAMSIZ);
             break;
+        case 'a':
+            if( 0 == inet_aton(optarg, &argip) )
+            {
+                fprintf(stderr, "ipaddr invalid.\n");
+                goto final;
+            }
+            memcpy(&vnic[0].ipaddr, &argip, sizeof(struct in_addr));
+            break;
         case 'm':
-            strncpy(interface_name, optarg, IFNAMSIZ);
+            mac = ether_aton(optarg);
+            if( mac == NULL )
+            {
+                fprintf(stderr, "macaddr invalid.\n");
+                goto final;
+            }
+            memcpy(&vnic[0].macaddr, mac, sizeof(struct ether_addr));
             break;
         default: /* '?' */
             fprintf(stderr, USAGE_STR, argv[0]);
