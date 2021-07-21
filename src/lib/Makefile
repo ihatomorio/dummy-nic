@@ -17,7 +17,7 @@ pre-build:
 	@ if [ ! -d "$(OBJ_DIR)" ]; then \
 		install -d $(OBJ_DIR); \
 		fi;
-	make -C handler
+	@make -C handler
 
 # サフィックスルールにより依存ファイルを全てコンパイル
 build: $(OBJS)

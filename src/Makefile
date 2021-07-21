@@ -5,7 +5,7 @@ OBJS = $(patsubst %.c,$(OBJ_DIR)%.o,$(SRCS))
 DEPS = $(patsubst %.c,$(OBJ_DIR)%.d,$(SRCS))
 
 TARGET = $(OBJ_DIR)dummy-nic
-LIBOBJS = lib/$(OBJ_DIR)raw_socket.o lib/$(OBJ_DIR)util.o lib/$(OBJ_DIR)packet_handler.o lib/handler/$(OBJ_DIR)arp.o
+LIBOBJS = lib/$(OBJ_DIR)raw_socket.o lib/$(OBJ_DIR)util.o lib/$(OBJ_DIR)packet_handler.o lib/handler/$(OBJ_DIR)arp.o lib/handler/$(OBJ_DIR)icmp.o
 
 # 定義済みマクロの再定義
 CC = gcc
