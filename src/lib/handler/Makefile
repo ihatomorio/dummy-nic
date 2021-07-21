@@ -1,5 +1,5 @@
 # ターゲットの定義
-SRCS = arp.c icmp.c
+SRCS = packet_handler.c arp.c icmp.c ip.c
 OBJ_DIR = .obj/
 OBJS = $(patsubst %.c,$(OBJ_DIR)%.o,$(SRCS))
 DEPS = $(patsubst %.c,$(OBJ_DIR)%.d,$(SRCS))

@@ -14,7 +14,7 @@
 
 #include "lib/raw_socket.h"
 #include "lib/util.h"
-#include "lib/packet_handler.h"
+#include "lib/handler/packet_handler.h"
 #include "lib/handler/arp.h"
 #include "include/nicinfo.h"
 

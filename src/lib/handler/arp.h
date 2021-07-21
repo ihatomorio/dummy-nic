@@ -2,6 +2,8 @@
 #define __ARP_H
 
 #include <stdbool.h>
+#include <net/ethernet.h>
+#include <netinet/in.h>
 
 extern struct nicinfo *vnic;
 extern int vnic_entry;
