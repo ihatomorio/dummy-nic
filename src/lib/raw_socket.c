@@ -124,7 +124,7 @@ int get_raw_socket(const char *device_name)
     {
         snprintf(&bpfpath[0], BPF_PATH_BUFLEN, "/dev/bpf%d", i);
         
-        socket_descriptor = open(bpfpath, O_RDONLY);
+        socket_descriptor = open(bpfpath, O_RDWR);
         if( socket_descriptor > 0 )
         {
             fprintf(stdout, "got bpf %s\n", bpfpath);
