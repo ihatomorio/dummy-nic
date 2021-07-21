@@ -1,5 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <net/ethernet.h>
+#include <arpa/inet.h>
 
 void print_hex(void *buf, size_t buflen)
 {
@@ -24,4 +26,16 @@ void print_hex(void *buf, size_t buflen)
     }
 
     printf("\n");
+}
+
+void print_eth(struct ether_addr *addr)
+{
+    printf("%02x:%02x:%02x:%02x:%02x:%02x", addr->octet[0], addr->octet[1], addr->octet[2], addr->octet[3], addr->octet[4], addr->octet[5]);
+}
+
+void print_inet(struct in_addr *addr)
+{
+    char addrstr[INET_ADDRSTRLEN] = {0};
+    inet_ntop(AF_INET, addr, (char *)&addrstr, INET_ADDRSTRLEN);
+    printf("%s", addrstr);
 }
