@@ -29,9 +29,9 @@ void handle_arp(char *packet, ssize_t len)
 
     print_arp(packet, len);
 
-    switch (arp_hdr->ar_op)
+    switch (ntohs(arp_hdr->ar_op))
     {
-    case htons(ARPOP_REQUEST):
+    case ARPOP_REQUEST:
         for (i = 0; i < vnic_entry; i++)
         {
             if (is_same_ip(&vnic[i].ipaddr, arp_tpa))
@@ -41,7 +41,7 @@ void handle_arp(char *packet, ssize_t len)
         }
 
         break;
-    case htons(ARPOP_REPLY):
+    case ARPOP_REPLY:
         //nop
         break;
     }
@@ -116,9 +116,9 @@ void print_arp(char *packet, ssize_t len)
     print_eth((struct ether_addr *)eth_hdr->ether_dhost);
     printf(", ARP, length %zu: ", len);
 
-    switch (arp_hdr->ar_op)
+    switch (ntohs(arp_hdr->ar_op))
     {
-    case htons(ARPOP_REQUEST):
+    case ARPOP_REQUEST:
         if (0 == memcmp(arp_spa, &zero_ip, sizeof(struct in_addr)))
         {
             printf("Probe");
@@ -137,7 +137,7 @@ void print_arp(char *packet, ssize_t len)
         print_eth(arp_sha);
         printf(") ");
         break;
-    case htons(ARPOP_REPLY):
+    case ARPOP_REPLY:
         printf("Reply ");
         print_inet(arp_spa);
         printf(" is-at ");
