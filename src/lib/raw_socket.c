@@ -251,7 +251,7 @@ ssize_t read_raw_packet(int socket_descriptor, char **packet)
         return -1;
     }
 
-    ssize_t read_siz = read(socket_descriptor, *packet, BUFSIZ);
+    ssize_t read_siz = recv(socket_descriptor, *packet, BUFSIZ, 0);
     if( read_siz == -1 )
     {
         perror("read");
