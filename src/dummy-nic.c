@@ -11,7 +11,10 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <net/ethernet.h>
+
+#ifdef __linux
 #include <netinet/ether.h>  // ETHER_ATON
+#endif
 
 #include "lib/raw_socket.h"
 #include "lib/util.h"
