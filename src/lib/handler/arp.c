@@ -8,12 +8,9 @@
 
 #include "../raw_socket.h"
 #include "../util.h"
-#include "../../include/nicinfo.h"
 
 #include "arp.h"
-
-struct nicinfo *vnic = NULL;
-int vnic_entry = 0;
+#include "../nics.h"
 
 /// handle from ETHER frame
 void handle_arp(char *packet, ssize_t len)

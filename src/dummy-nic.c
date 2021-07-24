@@ -19,8 +19,7 @@
 #include "lib/raw_socket.h"
 #include "lib/util.h"
 #include "lib/handler/packet_handler.h"
-#include "lib/handler/arp.h"
-#include "include/nicinfo.h"
+#include "lib/nics.h"
 
 #define USAGE_STR "Usage: %s -I interface [-m macaddr] [-a ipaddr]\n"
 #define OPTION_CHAR "I:a:m:"

@@ -5,9 +5,6 @@
 #include <net/ethernet.h>
 #include <netinet/in.h>
 
-extern struct nicinfo *vnic;
-extern int vnic_entry;
-
 void handle_arp(char *packet, ssize_t len);
 
 void reply_arp(struct ether_addr *arp_sha, struct in_addr *arp_spa, struct ether_addr *arp_tha, struct in_addr *arp_tpa);
