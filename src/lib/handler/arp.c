@@ -46,18 +46,23 @@ void handle_arp(char *packet, ssize_t len)
 
 void reply_arp(struct ether_addr *sha, struct in_addr *spa, struct ether_addr *tha, struct in_addr *tpa)
 {
+    // Make ARP frame length
     ssize_t len = sizeof(struct ether_header) + sizeof(struct arphdr) + 2 * sizeof(struct ether_addr) + 2 * sizeof(struct in_addr);
+
+    // Allocate frame buffer
     void *packet = calloc(len, sizeof(char));
     if (packet == NULL)
     {
         return;
     }
 
+    // Set ether frame header
     struct ether_header *eth_hdr = (struct ether_header *)packet;
     memcpy(eth_hdr->ether_dhost, tha, sizeof(struct ether_addr));
     memcpy(eth_hdr->ether_shost, sha, sizeof(struct ether_addr));
     eth_hdr->ether_type = htons(ETHERTYPE_ARP);
 
+    // Set ARP frame header
     struct arphdr *arp_hdr = (void *)eth_hdr + sizeof(struct ether_header);
     arp_hdr->ar_hrd = htons(ARPHRD_ETHER);
     arp_hdr->ar_pro = htons(ETHERTYPE_IP);
@@ -65,6 +70,7 @@ void reply_arp(struct ether_addr *sha, struct in_addr *spa, struct ether_addr *t
     arp_hdr->ar_pln = sizeof(struct in_addr);
     arp_hdr->ar_op = htons(ARPOP_REPLY);
 
+    // Make ARP frame payload
     struct ether_addr *arp_sha = (void *)arp_hdr + sizeof(struct arphdr);
     struct in_addr *arp_spa = (void *)arp_sha + arp_hdr->ar_hln;
     struct ether_addr *arp_tha = (void *)arp_spa + arp_hdr->ar_pln;
@@ -77,6 +83,8 @@ void reply_arp(struct ether_addr *sha, struct in_addr *spa, struct ether_addr *t
     printf("its me!\n");
     print_arp(packet, len);
     print_hex(packet, len);
+
+    // send ARP frame
     send(raw_sockfd, packet, len, 0);
 }
 
